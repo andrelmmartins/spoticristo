@@ -8,14 +8,15 @@ html {
 
 body {
   color: #0D0D0B;
-  /* background: url('/background.png'); 
-  background-blend-mode: multiply; */
-
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .background {
+    background: url('/background.png'); 
   }
 }
 
