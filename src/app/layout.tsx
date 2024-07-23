@@ -16,6 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <title>EAC music</title>
+      </head>
       <body className={font.className}>{children}</body>
     </html>
   );
