@@ -1,113 +1,91 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+
+import MusicButton from "@/components/MusicButton";
+
+const musics = [
+  "A alegria do senhor é nossa força (E).mp3",
+  "A escolhida (E).mp3",
+  "A pé seco (G).mp3",
+  "Abraço bom (G).mp3",
+  "chuva de grava (studio) - C.mp3",
+  "Dança da amizade (G).mp3",
+  "derrama o ter amor (studio) - F.mp3",
+  "Derrama o teu amor aqui (F).mp3",
+  "Deus quero louvar-te (E).mp3",
+  "Estatua de sal (D).mp3",
+  "Estrangeiro aqui (C) .mp3",
+  "Eu quero ser de Deus (D) .mp3",
+  "Exército de Deus (G).mp3",
+  "Marca da Vitória (Am) .mp3",
+  "Melo dos Animais - E.mp3",
+  "Melo dos animais (E) .mp3",
+  "Minha essência (A).mp3",
+  "Molinho para Jesus (D).mp3",
+  "Nosso general (Am).mp3",
+  "o amor (Studio) - C.mp3",
+  "O senhor é rei (Bm).mp3",
+  "passa fogo (C).mp3",
+  "passeio e caranguejo - Am.mp3",
+  "Pescador de Cristo (E).mp3",
+  "Pipoca (G).mp3",
+  "Pirado por Jesus (E).mp3",
+  "quero louvar- te (E).mp3",
+  "Reggae do missionário (C).mp3",
+  "Templo Vivo (C).mp3",
+  "Templo Vivo (studio) - C.mp3",
+  "tum-tum-tum de Deus (E).mp3",
+  "txuco - D.mp3",
+  "txuco (D).mp3",
+  "vamos cantar (D).mp3",
+];
 
 export default function Home() {
+  const [musicName, setMusicName] = useState<string>();
+  const [music, setMusic] = useState<HTMLAudioElement>();
+
+  useEffect(() => {
+    music?.pause();
+
+    if (musicName) {
+      const audio = new Audio(`/musics/${encodeURIComponent(musicName)}`);
+      audio.play();
+      setMusic(audio)
+    }
+  }, [musicName]);
+
+  useEffect(() => {
+    if(music) {
+      music.addEventListener("ended", () => {
+        setMusicName(undefined);
+      });
+  
+      return () => {
+        music.removeEventListener("ended", () => {
+          setMusicName(undefined);
+        });
+      };
+    }
+  }, [music])
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+    <main className="min-h-screen flex  flex-col items-center gap-6 p-24">
+      <h1 className="font-bold text-3xl">EAC music</h1>
+      {musics.map((m, i) => {
+        const iMPlaying = m === musicName;
+        return (
+          <MusicButton
+            key={`music-${i}`}
+            name={m.replace(".mp3", "")}
+            playing={iMPlaying}
+            onClick={() => {
+              if (iMPlaying) setMusicName(undefined);
+              else setMusicName(m);
+            }}
+          />
+        );
+      })}
     </main>
   );
 }
