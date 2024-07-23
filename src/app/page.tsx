@@ -70,7 +70,7 @@ export default function Home() {
   }, [music])
 
   return (
-    <main className="min-h-screen flex  flex-col items-center gap-6 p-24">
+    <main className="min-h-screen flex  flex-col items-center gap-6 py-24 px-6">
       <h1 className="font-bold text-3xl">EAC music</h1>
       {musics.map((m, i) => {
         const iMPlaying = m === musicName;
