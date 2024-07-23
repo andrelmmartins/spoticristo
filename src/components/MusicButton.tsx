@@ -18,7 +18,7 @@ export default function MusicButton(props: Props) {
     <button
       disabled={props.disabled}
       onClick={props.onClick}
-      className={`relative z-[1] h-24 border-[3px] overflow-hidden bg-white border-black rounded-lg w-full max-w-[500px] p-5 pt-8 gap-5 flex items-center cursor-pointer transition-all duration-300 disabled:opacity-30 ${
+      className={`relative z-[1] h-24 border-[3px] overflow-hidden bg-white border-black rounded-lg w-full p-5 pt-8 gap-5 flex items-center cursor-pointer transition-all duration-300 disabled:opacity-30 ${
         props.playing ? "border-l-[15px]" : ""
       }`}
     >
