@@ -6,15 +6,15 @@ export interface Music {
 }
 
 export const musics: Music[] = [
+  { studio: false, tone: "G", name: "Abraço bom", src: "Abraço bom (G).mp3" },
   {
     studio: false,
     tone: "E",
     name: "A alegria do senhor é nossa força",
     src: "A alegria do senhor é nossa força (E).mp3",
   },
-  { studio: false, tone: "E", name: "A escolhida", src: "A escolhida (E).mp3" },
   { studio: false, tone: "G", name: "A pé seco", src: "A pé seco (G).mp3" },
-  { studio: false, tone: "G", name: "Abraço bom", src: "Abraço bom (G).mp3" },
+  { studio: false, tone: "Dm", name: "A Vitória", src: "a vitoria.mp3" },
   {
     studio: true,
     tone: "C",
@@ -22,10 +22,10 @@ export const musics: Music[] = [
     src: "chuva de grava (studio) - C.mp3",
   },
   {
-    studio: false,
+    studio: true,
     tone: "G",
     name: "Dança da amizade",
-    src: "Dança da amizade (G).mp3",
+    src: "danca da amizade.mp3",
   },
   {
     studio: true,
@@ -40,10 +40,10 @@ export const musics: Music[] = [
     src: "Derrama o teu amor aqui (F).mp3",
   },
   {
-    studio: false,
+    studio: true,
     tone: "E",
-    name: "Deus quero louvar-te",
-    src: "Deus quero louvar-te (E).mp3",
+    name: "enviai",
+    src: "enviai.mp3",
   },
   {
     studio: false,
@@ -82,22 +82,10 @@ export const musics: Music[] = [
     src: "Marca da Vitória (Am) .mp3",
   },
   {
-    studio: false,
+    studio: true,
     tone: "E",
     name: "Melo dos Animais",
     src: "Melo dos Animais - E.mp3",
-  },
-  {
-    studio: false,
-    tone: "E",
-    name: "Melo dos animais",
-    src: "Melo dos animais (E) .mp3",
-  },
-  {
-    studio: false,
-    tone: "A",
-    name: "Minha essência",
-    src: "Minha essência (A).mp3",
   },
   {
     studio: true,
@@ -106,10 +94,10 @@ export const musics: Music[] = [
     src: "Minha Essência.mp3",
   },
   {
-    studio: false,
+    studio: true,
     tone: "D",
     name: "Molinho para Jesus",
-    src: "Molinho para Jesus (D).mp3",
+    src: "molinho.mp3",
   },
   {
     studio: false,
@@ -130,44 +118,32 @@ export const musics: Music[] = [
     src: "o amor (Studio) - C.mp3",
   },
   {
-    studio: false,
+    studio: true,
     tone: "Bm",
-    name: "O senhor é rei",
-    src: "O senhor é rei (Bm).mp3",
+    name: "O Senhor é Rei",
+    src: "senhor e rei.mp3",
   },
-  { studio: false, tone: "C", name: "passa fogo", src: "passa fogo (C).mp3" },
+  { studio: true, tone: "C", name: "passa fogo", src: "vem fogo.mp3" },
   {
-    studio: false,
+    studio: true,
     tone: "Am",
-    name: "passeio e caranguejo",
+    name: "passeio de caranguejo",
     src: "passeio e caranguejo - Am.mp3",
   },
   {
-    studio: false,
+    studio: true,
     tone: "E",
     name: "Pescador de Cristo",
-    src: "Pescador de Cristo (E).mp3",
+    src: "pescador.mp3",
   },
-  { studio: false, tone: "G", name: "Pipoca", src: "Pipoca (G).mp3" },
+  { studio: true, tone: "G", name: "Pipoca", src: "pipoca.mp3" },
   {
-    studio: false,
+    studio: true,
     tone: "E",
     name: "Pirado por Jesus",
-    src: "Pirado por Jesus (E).mp3",
+    src: "pirado.mp3",
   },
-  {
-    studio: false,
-    tone: "E",
-    name: "quero louvar-te",
-    src: "quero louvar- te (E).mp3",
-  },
-  {
-    studio: false,
-    tone: "C",
-    name: "Reggae do missionário",
-    src: "Reggae do missionário (C).mp3",
-  },
-  {
+    {
     studio: true,
     tone: "C",
     name: "Reggae do missionário",
@@ -179,7 +155,18 @@ export const musics: Music[] = [
     name: "Pot Pourri - Reggae do Míssionário e Tum tum tum",
     src: "Pot Pourri - Reggae do Míssionário e Tum tum tum.mp3",
   },
-  { studio: false, tone: "C", name: "Templo Vivo", src: "Templo Vivo (C).mp3" },
+  {
+    studio: true,
+    tone: "C",
+    name: "Pot Pourri 1",
+    src: "potpourri.mp3",
+  },
+  {
+    studio: true,
+    tone: "D",
+    name: "Pot Pourri - Uma entre todas e Quem é essa",
+    src: "maria.mp3",
+  },
   {
     studio: true,
     tone: "C",
@@ -187,12 +174,11 @@ export const musics: Music[] = [
     src: "Templo Vivo (studio) - C.mp3",
   },
   {
-    studio: false,
-    tone: "E",
-    name: "tum-tum-tum de Deus",
-    src: "tum-tum-tum de Deus (E).mp3",
+    studio: true,
+    tone: "D",
+    name: "Se for para agradar a Deus",
+    src: "nana.mp3",
   },
-  { studio: true, tone: "D", name: "txuco", src: "txuco - D.mp3" },
-  { studio: false, tone: "D", name: "txuco", src: "txuco (D).mp3" },
-  { studio: false, tone: "D", name: "vamos cantar", src: "vamos cantar (D).mp3" },
+  { studio: true, tone: "D", name: "txuco", src: "txuco1.mp3" },
+  { studio: true, tone: "D", name: "vamos cantar", src: "vamos cantar.mp3" },
 ];
