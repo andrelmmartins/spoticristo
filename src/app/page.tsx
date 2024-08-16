@@ -12,6 +12,7 @@ export default function Home() {
   const [music, setMusic] = useState<HTMLAudioElement>();
 
   const [studio, setStudio] = useState(false);
+  const [caminho, setCaminho] = useState(false);
 
   useEffect(() => {
     music?.pause();
@@ -43,9 +44,12 @@ export default function Home() {
         <h1 className="font-bold text-3xl">
           <span className="text-blue-dark">#</span>EAC music
         </h1>
-        <div className="mb-4 flex flex-wrap max-w-[500px]">
+        <div className="mb-4 flex flex-wrap max-w-[500px] gap-4">
           <button
-            onClick={() => setStudio(!studio)}
+            onClick={() => {
+              setStudio(!studio);
+              setCaminho(false);
+            }}
             className={`flex gap-2 cursor-pointer font-bold ${
               studio ? "bg-blue-dark text-white" : "bg-black/30"
             } px-5 h-10 items-center rounded-full`}
@@ -53,17 +57,33 @@ export default function Home() {
             studio
             <Filter className="h-5 w-5" />
           </button>
+          <button
+            onClick={() => {
+              setCaminho(!caminho);
+              setStudio(false);
+            }}
+            className={`flex gap-2 cursor-pointer font-bold ${
+              caminho ? "bg-red text-white" : "bg-black/30"
+            } px-5 h-10 items-center rounded-full`}
+          >
+            Dinâmica do caminho
+            <Filter className="h-5 w-5" />
+          </button>
         </div>
         {musics.map((m, i) => {
           const iMPlaying = m.src === musicName;
           return (
-            <div className="bg-white w-full max-w-[500px] flex justify-center z-[1]" key={`music-${i}`}>
+            <div
+              className="bg-white w-full max-w-[500px] flex justify-center z-[1]"
+              key={`music-${i}`}
+            >
               <MusicButton
                 studio={m.studio}
+                caminho={m.caminho}
                 tone={m.tone}
                 name={formatName(m.name)}
                 playing={iMPlaying}
-                disabled={studio && !m.studio}
+                disabled={(studio && !m.studio) || (caminho && !m.caminho)}
                 onClick={() => {
                   if (iMPlaying) setMusicName(undefined);
                   else setMusicName(m.src);

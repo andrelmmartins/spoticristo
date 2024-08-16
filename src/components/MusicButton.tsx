@@ -8,6 +8,7 @@ interface Props {
   playing: boolean;
   tone: string;
   studio: boolean;
+  caminho: boolean;
   disabled: boolean;
 }
 
@@ -29,6 +30,11 @@ export default function MusicButton(props: Props) {
         {props.studio && (
           <span className="bg-blue-dark text-white px-2 rounded-br-lg font-bold -ml-2 pl-4">
             studio
+          </span>
+        )}
+        {props.caminho && (
+          <span className="bg-red text-white px-2 rounded-br-lg font-bold -ml-2 pl-4">
+            Dinâmica do Caminho
           </span>
         )}
       </div>
