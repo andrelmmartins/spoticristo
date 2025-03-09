@@ -5,8 +5,8 @@ import "./globals.css";
 const font = Manrope({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EAC music",
-  description: "App para ouvir as música do EAC",
+  title: "SpotiCristo",
+  description: "App para ouvir as gravadas para Cristo",
 };
 
 export default function RootLayout({
