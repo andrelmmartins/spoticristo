@@ -15,7 +15,7 @@ export default function Service() {
   const [musics, setMusics] = useState<Music[]>([]);
   const [musicName, setMusicName] = useState<string>();
   const [music, setMusic] = useState<HTMLAudioElement>();
-  const [filter, setFilter] = useState<string | undefined>("studio");
+  const [filter, setFilter] = useState<string | undefined>();
 
   async function handleGetMusics() {
     try {
