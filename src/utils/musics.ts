@@ -2,8 +2,8 @@ export interface Music {
   tone: string;
   name: string;
   src: string;
-  // studio: boolean;
-  // caminho: boolean;
+  studio?: boolean;
+  caminho?: boolean;
 }
 
 // export const musics: Music[] = [

@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getServices } from '@/service/api'
+import { getServices, Table } from '@/service/api'
 
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
-  const [services, setServices] = useState<string[]>([]);
+  const [services, setServices] = useState<Table[]>([]);
 
   async function handleServices() {
     try {
       const response = await getServices()
-      setServices(response.data.tables.map((table) => table.name))
+      setServices(response.data.tables)
     } catch {
 
     }
@@ -32,13 +32,13 @@ export default function Home() {
         {services.map((service, i) => {
           return (
             <div
-              className="bg-black text-white p-10"
+              className="bg-black text-white p-10 cursor-pointer"
               key={`service-${i}`}
               onClick={() => {
-                router.push(encodeURIComponent(service));
+                router.push(encodeURIComponent(service.name));
               }}
             >
-              {service}
+              {service.name}
             </div>
           );
         })}

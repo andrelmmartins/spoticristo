@@ -24,7 +24,7 @@ interface View {
   type: string;
 }
 
-interface Table {
+export interface Table {
   id: string;
   name: string;
   primaryFieldId: string;
@@ -43,6 +43,8 @@ export const getServices = async () => {
 interface RecordFields {
   name: string;
   tone: string;
+  studio?: boolean;
+  caminho?: boolean;
   src: {
     id: string
     url: string
