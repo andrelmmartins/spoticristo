@@ -160,7 +160,8 @@ export async function uploadAttachment({ recordId, fieldId, file }: {
     {
       method: "POST",
       body: JSON.stringify({
-        contentType: file.type || "audio/webm",
+        // Airtable rejects MIME parameters (e.g. codecs=opus) with a misleading 403.
+        contentType: file.type.split(";")[0].trim() || "audio/webm",
         file: bytes,
         filename: file.name,
       }),

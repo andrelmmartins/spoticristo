@@ -1,5 +1,7 @@
 "use client";
 
+import MusicPlayer from "@/components/MusicPlayer";
+import { fixWebmDuration } from "@fix-webm-duration/fix";
 import { Song } from "@/@types/interfaces";
 import {
   forgetRecording,
@@ -253,6 +255,8 @@ export default function RecordingForm({
   const [playlists, setPlaylists] = useState<string[]>(song?.playlists || []);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [previewPlaying, setPreviewPlaying] = useState(false);
+  const recordingStartedAt = useRef(0);
   const [isRecording, setIsRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -263,7 +267,7 @@ export default function RecordingForm({
 
   useEffect(() => {
     const timer = isRecording
-      ? window.setInterval(() => setSeconds((value) => value + 1), 1000)
+      ? window.setInterval(() => setSeconds(Math.floor((performance.now() - recordingStartedAt.current) / 1000)), 1000)
       : undefined;
     return () => { if (timer) window.clearInterval(timer); };
   }, [isRecording]);
@@ -275,6 +279,7 @@ export default function RecordingForm({
 
   function setAudio(nextFile: File | null) {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewPlaying(false);
     setFile(nextFile);
     setPreviewUrl(nextFile ? URL.createObjectURL(nextFile) : "");
   }
@@ -333,20 +338,29 @@ export default function RecordingForm({
           recorder.stop();
         }
       };
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         const type = recorder.mimeType || "audio/webm";
-        const blob = new Blob(chunksRef.current, { type });
+        let blob = new Blob(chunksRef.current, { type });
+        const elapsed = performance.now() - recordingStartedAt.current;
         stream.getTracks().forEach((track) => track.stop());
-        if (blob.size && blob.size <= MAX_AUDIO_BYTES) {
-          setAudio(new File([blob], `gravacao.${extensionFor(type)}`, { type }));
+        try {
+          if (blob.size && blob.size <= MAX_AUDIO_BYTES) {
+            if (type.includes("webm")) blob = await fixWebmDuration(blob, elapsed, { logger: false });
+            if (blob.size > MAX_AUDIO_BYTES) throw new Error("A gravação ultrapassou 4 MB. Grave uma versão menor.");
+            setAudio(new File([blob], `gravacao.${extensionFor(type)}`, { type }));
+          }
+        } catch {
+          setError("Não foi possível preparar o áudio. Grave novamente.");
+        } finally {
+          setIsRecording(false);
         }
-        setIsRecording(false);
       };
       recorder.onerror = () => {
         setError("A gravação foi interrompida pelo navegador. Tente novamente.");
         stream.getTracks().forEach((track) => track.stop());
         setIsRecording(false);
       };
+      recordingStartedAt.current = performance.now();
       recorder.start(1000);
       setIsRecording(true);
     } catch (cause) {
@@ -558,7 +572,13 @@ export default function RecordingForm({
               </div>
               <button type="button" onClick={() => setAudio(null)} className="shrink-0 rounded-full px-3 py-2 text-sm text-dark-300 hover:bg-dark-700 hover:text-white">Descartar</button>
             </div>
-            <audio controls src={previewUrl} className="h-10 w-full" />
+            <MusicPlayer
+              inline
+              currentSong={{ id: "preview", name: name.trim() || "Prévia da gravação", tone, src: previewUrl, tags: [], playlists: [] }}
+              isPlaying={previewPlaying}
+              onPlayPause={() => setPreviewPlaying((playing) => !playing)}
+              onPlaybackChange={setPreviewPlaying}
+            />
           </div>
         )}
 

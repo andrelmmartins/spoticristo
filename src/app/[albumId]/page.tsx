@@ -135,6 +135,10 @@ export default function AlbumPage() {
 
     const currentIndex = filteredSongs.findIndex((song) => song.id === currentSong.id);
     const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % filteredSongs.length;
+    if (filteredSongs[nextIndex].id === currentSong.id) {
+      setIsPlaying(false);
+      return;
+    }
     setCurrentSong(filteredSongs[nextIndex]);
   };
 
@@ -312,7 +316,7 @@ export default function AlbumPage() {
         onPlayPause={handlePlayPause}
         onNext={handleNext}
         onPrevious={handlePrevious}
-        onSongSelect={handleSongSelect}
+        onPlaybackChange={setIsPlaying}
         onClose={handleClosePlayer}
       />
     </div>
