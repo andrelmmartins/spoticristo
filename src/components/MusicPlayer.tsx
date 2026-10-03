@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Play, Pause, SkipBack, SkipForward, X, Music, Loader2 } from 'lucide-react'
 import { Song } from '@/@types/interfaces'
+import { getAudioDuration } from '@/lib/audioDuration'
 
 interface MusicPlayerProps {
   currentSong: Song | null
@@ -17,13 +18,26 @@ interface MusicPlayerProps {
 
 const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, onNext, onPrevious, onClose, inline = false, onPlaybackChange }: MusicPlayerProps) => {
   const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
+  const [metadataDuration, setMetadataDuration] = useState(0)
+  const [decodedDuration, setDecodedDuration] = useState<{ source: string; value: number } | null>(null)
   
   const audioRef = useRef<HTMLAudioElement>(null)
 
   const [isLoading, setIsLoading] = useState(false)
   const [playbackError, setPlaybackError] = useState('')
   const source = currentSong?.src
+  const duration = decodedDuration && decodedDuration.source === source ? decodedDuration.value : metadataDuration
+
+  useEffect(() => {
+    if (!source) return
+    const controller = new AbortController()
+    getAudioDuration(source, controller.signal).then((value) => {
+      if (!controller.signal.aborted) setDecodedDuration({ source, value })
+    }).catch(() => {
+      // Native metadata remains available for formats the Web Audio decoder cannot read.
+    })
+    return () => controller.abort()
+  }, [source])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -49,7 +63,7 @@ const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, onNext, onPrevious, 
     const audio = audioRef.current
     if (!audio) return
     setCurrentTime(Number.isFinite(audio.currentTime) ? audio.currentTime : 0)
-    setDuration(Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0)
+    setMetadataDuration(Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0)
   }
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,7 +99,7 @@ const MusicPlayer = ({ currentSong, isPlaying, onPlayPause, onNext, onPrevious, 
         ref={audioRef}
         src={source}
         preload="auto"
-        onLoadStart={() => { setCurrentTime(0); setDuration(0); setPlaybackError(''); setIsLoading(isPlaying) }}
+        onLoadStart={() => { setCurrentTime(0); setMetadataDuration(0); setPlaybackError(''); setIsLoading(isPlaying) }}
         onDurationChange={handleTimeUpdate}
         onPlaying={() => { setIsLoading(false); onPlaybackChange?.(true) }}
         onWaiting={() => setIsLoading(isPlaying)}

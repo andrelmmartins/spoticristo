@@ -2,6 +2,7 @@
 
 import MusicPlayer from "@/components/MusicPlayer";
 import { fixWebmDuration } from "@fix-webm-duration/fix";
+import { decodeAudioDuration } from "@/lib/audioDuration";
 import { Song } from "@/@types/interfaces";
 import {
   forgetRecording,
@@ -273,12 +274,19 @@ export default function RecordingForm({
   }, [isRecording]);
 
   useEffect(() => () => {
+    const recorder = recorderRef.current;
+    if (recorder) {
+      recorder.onstop = null;
+      if (recorder.state !== "inactive") recorder.stop();
+    }
     streamRef.current?.getTracks().forEach((track) => track.stop());
+  }, []);
+
+  useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
   }, [previewUrl]);
 
   function setAudio(nextFile: File | null) {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewPlaying(false);
     setFile(nextFile);
     setPreviewUrl(nextFile ? URL.createObjectURL(nextFile) : "");
@@ -345,7 +353,10 @@ export default function RecordingForm({
         stream.getTracks().forEach((track) => track.stop());
         try {
           if (blob.size && blob.size <= MAX_AUDIO_BYTES) {
-            if (type.includes("webm")) blob = await fixWebmDuration(blob, elapsed, { logger: false });
+            if (type.includes("webm")) {
+              const duration = await decodeAudioDuration(await blob.arrayBuffer()).catch(() => elapsed / 1000);
+              blob = await fixWebmDuration(blob, duration * 1000, { logger: false });
+            }
             if (blob.size > MAX_AUDIO_BYTES) throw new Error("A gravação ultrapassou 4 MB. Grave uma versão menor.");
             setAudio(new File([blob], `gravacao.${extensionFor(type)}`, { type }));
           }
@@ -461,13 +472,13 @@ export default function RecordingForm({
     }
   }
 
-  if (!authenticated) {
+  if (!song && !authenticated) {
     return (
       <form onSubmit={authenticate} className="mx-auto max-w-lg rounded-2xl border border-dark-700 bg-dark-800/60 p-5 shadow-2xl sm:p-8">
         <div className="mb-6">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-spotify-green">Acesso protegido</p>
           <h1 className="mt-2 text-2xl font-bold text-white">Digite a senha para continuar</h1>
-          <p className="mt-2 text-sm text-dark-300">A senha protege a criação e edição das gravações.</p>
+          <p className="mt-2 text-sm text-dark-300">A senha protege a criação das gravações.</p>
         </div>
 
         {error && (
@@ -583,7 +594,18 @@ export default function RecordingForm({
         )}
 
         {!file && !isRecording && song && (
-          <p className="mt-4 text-sm text-dark-400">O áudio atual será mantido se você não gravar ou enviar outro.</p>
+          <div className="mt-5 space-y-3">
+            <p className="text-sm text-dark-400">O áudio atual será mantido se você não gravar ou enviar outro.</p>
+            {song.src && (
+              <MusicPlayer
+                inline
+                currentSong={song}
+                isPlaying={previewPlaying}
+                onPlayPause={() => setPreviewPlaying((playing) => !playing)}
+                onPlaybackChange={setPreviewPlaying}
+              />
+            )}
+          </div>
         )}
       </section>
 

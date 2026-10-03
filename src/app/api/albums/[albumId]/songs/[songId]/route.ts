@@ -1,6 +1,5 @@
 import { airtableWriteErrorMessage, assertAlbumTable, deleteRecord, getTable, replaceAttachment, updateRecord } from "@/lib/airtable";
-import { COOKIE_NAME, hasValidOwnershipProof, hasValidSession } from "@/lib/auth";
-import { cookies } from "next/headers";
+import { hasValidOwnershipProof } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -15,7 +14,6 @@ function parseList(value: FormDataEntryValue | null) {
 }
 
 async function authorize(request: Request, albumId: string, songId: string) {
-  if (!hasValidSession(cookies().get(COOKIE_NAME)?.value)) return "Senha necessária.";
   const form = await request.formData();
   if (!hasValidOwnershipProof(form.get("proof"), albumId, songId)) return "Este navegador não tem permissão para editar esta música.";
   return form;
@@ -23,9 +21,9 @@ async function authorize(request: Request, albumId: string, songId: string) {
 
 export async function PATCH(request: Request, { params }: { params: { albumId: string; songId: string } }) {
   try {
-    await assertAlbumTable(params.albumId);
     const form = await authorize(request, params.albumId, params.songId);
     if (typeof form === "string") return NextResponse.json({ message: form }, { status: 403 });
+    await assertAlbumTable(params.albumId);
     const name = String(form.get("name") || "").trim();
     const tone = String(form.get("tone") || "").trim();
     if (!name || !tone) return NextResponse.json({ message: "Informe nome e tom." }, { status: 400 });
@@ -50,10 +48,9 @@ export async function PATCH(request: Request, { params }: { params: { albumId: s
 
 export async function DELETE(request: Request, { params }: { params: { albumId: string; songId: string } }) {
   try {
-    await assertAlbumTable(params.albumId);
-    if (!hasValidSession(cookies().get(COOKIE_NAME)?.value)) return NextResponse.json({ message: "Senha necessária." }, { status: 401 });
     const { proof } = await request.json();
     if (!hasValidOwnershipProof(proof, params.albumId, params.songId)) return NextResponse.json({ message: "Este navegador não tem permissão para excluir esta música." }, { status: 403 });
+    await assertAlbumTable(params.albumId);
     await deleteRecord(params.albumId, params.songId);
     return NextResponse.json({ ok: true });
   } catch (error) {
