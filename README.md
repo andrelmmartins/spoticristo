@@ -7,8 +7,8 @@ princípios em `.specify/memory/constitution.md`.
 ## Getting Started
 
 Para habilitar as playlists, adicione em cada tabela de músicas do Airtable um
-campo chamado `playlist`. Ele pode ser do tipo **seleção única** ou **seleção
-múltipla**. Os cards são criados automaticamente a partir dos valores
+campo chamado `playlist` do tipo **seleção múltipla**. O campo `tags` também
+deve ser do tipo **seleção múltipla**. Os cards são criados automaticamente a partir dos valores
 preenchidos nesse campo; músicas sem playlist continuam aparecendo na listagem
 geral.
 

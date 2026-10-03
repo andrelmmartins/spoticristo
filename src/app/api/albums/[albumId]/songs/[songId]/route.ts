@@ -1,4 +1,4 @@
-import { assertAlbumTable, deleteRecord, getTable, replaceAttachment, updateRecord } from "@/lib/airtable";
+import { airtableWriteErrorMessage, assertAlbumTable, deleteRecord, getTable, replaceAttachment, updateRecord } from "@/lib/airtable";
 import { COOKIE_NAME, hasValidOwnershipProof, hasValidSession } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -44,7 +44,7 @@ export async function PATCH(request: Request, { params }: { params: { albumId: s
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Unable to update song", error);
-    return NextResponse.json({ message: "Não foi possível atualizar a música." }, { status: 500 });
+    return NextResponse.json({ message: airtableWriteErrorMessage(error, "Não foi possível atualizar a música.") }, { status: 500 });
   }
 }
 
@@ -58,6 +58,6 @@ export async function DELETE(request: Request, { params }: { params: { albumId: 
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Unable to delete song", error);
-    return NextResponse.json({ message: "Não foi possível excluir a música." }, { status: 500 });
+    return NextResponse.json({ message: airtableWriteErrorMessage(error, "Não foi possível excluir a música.") }, { status: 500 });
   }
 }

@@ -2,7 +2,7 @@
 
 import { useSong } from "@/contexts/SongContext";
 import { useAlbum } from "@/contexts/AlbumContext";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import AlbumHeader from "@/components/AlbumHeader";
 import SongList from "@/components/SongList";
@@ -11,7 +11,7 @@ import AlbumPageSkeleton from "@/components/AlbumPageSkeleton";
 import MusicPlayer from "@/components/MusicPlayer";
 import PlaylistSection from "@/components/PlaylistSection";
 import { Song } from "@/@types/interfaces";
-import RecordingModal, { getOwnedRecordingIds } from "@/components/RecordingModal";
+import { getOwnedRecordingIds } from "@/lib/recordingOwnership";
 import { ArrowLeft, Music, Search, X } from "lucide-react";
 import Link from "next/link";
 
@@ -24,6 +24,7 @@ function normalizeSearch(value: string) {
 
 export default function AlbumPage() {
   const { albumId } = useParams();
+  const router = useRouter();
   const { albums, isLoadingAlbums } = useAlbum();
   const { 
     songs, 
@@ -31,13 +32,11 @@ export default function AlbumPage() {
     currentSong, 
     isPlaying, 
     getSongs, 
-    refreshSongs,
     setCurrentSong, 
     setIsPlaying, 
   } = useSong();
   const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [modalSong, setModalSong] = useState<Song | null | undefined>(undefined);
   const [ownedSongIds, setOwnedSongIds] = useState<Set<string>>(new Set());
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
@@ -200,7 +199,7 @@ export default function AlbumPage() {
       <AlbumHeader 
         album={currentAlbum} 
         onPlayAll={handlePlayAll}
-        onAddSong={() => setModalSong(null)}
+        onAddSong={() => router.push(`/${currentAlbum.id}/record`)}
       />
 
       <div className="px-4 lg:px-8 py-8">
@@ -274,7 +273,7 @@ export default function AlbumPage() {
                   onSongSelect={handleSongSelect}
                   onPlayPause={handlePlayPause}
                   editableSongIds={ownedSongIds}
-                  onEditSong={(song) => setModalSong(song)}
+                  onEditSong={(song) => router.push(`/${currentAlbum.id}/record/${song.id}`)}
                 />
               ) : (
                 <div className="rounded-lg border border-dark-700 bg-dark-800/40 py-12 text-center">
@@ -316,19 +315,6 @@ export default function AlbumPage() {
         onSongSelect={handleSongSelect}
         onClose={handleClosePlayer}
       />
-      {modalSong !== undefined && (
-        <RecordingModal
-          albumId={currentAlbum.id}
-          song={modalSong || undefined}
-          availableTags={Array.from(new Set(songs.flatMap((song) => song.tags)))}
-          availablePlaylists={Array.from(new Set(songs.flatMap((song) => song.playlists)))}
-          onClose={() => setModalSong(undefined)}
-          onSaved={async () => {
-            await refreshSongs(currentAlbum.id);
-            setOwnedSongIds(new Set(getOwnedRecordingIds()));
-          }}
-        />
-      )}
     </div>
   );
 }

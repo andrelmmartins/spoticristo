@@ -33,6 +33,22 @@ interface AirtableListResponse {
   offset?: string;
 }
 
+export class AirtableRequestError extends Error {
+  constructor(public readonly status: number, public readonly responseBody: string) {
+    super(`Airtable respondeu ${status}`);
+    this.name = "AirtableRequestError";
+  }
+}
+
+export function airtableWriteErrorMessage(error: unknown, fallback: string) {
+  if (!(error instanceof AirtableRequestError)) return fallback;
+  if (error.status === 401) return "O token do Airtable está inválido ou expirou.";
+  if (error.status === 403) return "O token do Airtable não tem acesso para concluir a gravação. Confira o acesso à base e os escopos data.records:write, schema.bases:read e schema.bases:write.";
+  if (error.status === 413) return "O Airtable recusou o tamanho do áudio. Grave uma versão menor.";
+  if (error.status === 422) return "O Airtable recusou os dados. Confira os campos name, tone, tags, playlist e src da tabela deste álbum.";
+  return fallback;
+}
+
 function config() {
   const token = process.env.AIRTABLE_TOKEN || process.env.NEXT_PUBLIC_AIRTABLE_TOKEN;
   const base = process.env.AIRTABLE_BASE || process.env.NEXT_PUBLIC_AIRTABLE_BASE;
@@ -59,7 +75,7 @@ async function airtableFetch(url: string, init: RequestInit = {}) {
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`Airtable respondeu ${response.status}: ${body}`);
+    throw new AirtableRequestError(response.status, body);
   }
 
   return response;

@@ -1,4 +1,4 @@
-import { assertAlbumTable, createRecord, deleteRecord, getTable, replaceAttachment } from "@/lib/airtable";
+import { airtableWriteErrorMessage, assertAlbumTable, createRecord, deleteRecord, getTable, replaceAttachment } from "@/lib/airtable";
 import { COOKIE_NAME, createOwnershipProof, hasValidSession } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -42,6 +42,6 @@ export async function POST(request: Request, { params }: { params: { albumId: st
     return NextResponse.json({ id: record.id, proof: createOwnershipProof(params.albumId, record.id) });
   } catch (error) {
     console.error("Unable to create song", error);
-    return NextResponse.json({ message: "Não foi possível salvar a música." }, { status: 500 });
+    return NextResponse.json({ message: airtableWriteErrorMessage(error, "Não foi possível salvar a música.") }, { status: 500 });
   }
 }
