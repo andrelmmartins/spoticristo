@@ -1,8 +1,7 @@
 "use client";
 
 import { Song } from "@/@types/interfaces";
-import { getTableRecords, isSongFields } from "@/service/records";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext, useState } from "react";
 
 interface IContext {
@@ -12,6 +11,7 @@ interface IContext {
   isPlaying: boolean;
   currentAlbumId: string | null;
   getSongs: (albumId: string) => void;
+  refreshSongs: (albumId?: string) => Promise<void>;
   setCurrentSong: (song: Song | null) => void;
   setIsPlaying: (playing: boolean) => void;
   playNext: () => void;
@@ -21,41 +21,16 @@ interface IContext {
 export const SongContext = createContext({} as IContext);
 
 async function fetchSongs(albumId: string): Promise<Song[]> {
-  try {
-    const response = await getTableRecords(albumId);
-
-    const parsedSongs: Song[] = [];
-    response.records.forEach((record) => {
-      if (isSongFields(record.fields)) {
-        const playlistField = record.fields.playlist;
-        const playlists = (Array.isArray(playlistField)
-          ? playlistField
-          : playlistField
-            ? [playlistField]
-            : []
-        )
-          .map((playlist) => playlist.trim())
-          .filter(Boolean);
-
-        parsedSongs.push({
-          id: record.id || "",
-          tone: record.fields.tone || "",
-          name: record.fields.name || "",
-          src: record.fields.src?.[0]?.url || "",
-          tags: record.fields.tags || [],
-          playlists,
-        });
-      }
-    });
-
-    return parsedSongs;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  const response = await fetch(`/api/albums/${encodeURIComponent(albumId)}/songs`);
+  if (!response.ok) throw new Error("Não foi possível carregar as músicas.");
+  const data = await response.json() as { songs: Song[] };
+  return data.songs;
 }
 
+const ATTACHMENT_URL_REFRESH_MS = 90 * 60 * 1000;
+
 export const SongProvider = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = useQueryClient();
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentAlbumId, setCurrentAlbumId] = useState<string | null>(null);
@@ -64,11 +39,22 @@ export const SongProvider = ({ children }: { children: React.ReactNode }) => {
     queryKey: ["songs", currentAlbumId],
     queryFn: () => fetchSongs(currentAlbumId!),
     enabled: !!currentAlbumId,
+    staleTime: ATTACHMENT_URL_REFRESH_MS,
+    refetchInterval: ATTACHMENT_URL_REFRESH_MS,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 
   const getSongs = useCallback((albumId: string) => {
     setCurrentAlbumId(albumId);
   }, []);
+
+  const refreshSongs = useCallback(async (albumId = currentAlbumId) => {
+    if (!albumId) return;
+    await queryClient.invalidateQueries({ queryKey: ["songs", albumId] });
+    await queryClient.refetchQueries({ queryKey: ["songs", albumId], type: "active" });
+  }, [currentAlbumId, queryClient]);
 
   const playNext = useCallback(() => {
     if (currentSong && songs.length > 0) {
@@ -95,6 +81,7 @@ export const SongProvider = ({ children }: { children: React.ReactNode }) => {
         isPlaying,
         currentAlbumId,
         getSongs,
+        refreshSongs,
         setCurrentSong,
         setIsPlaying,
         playNext,

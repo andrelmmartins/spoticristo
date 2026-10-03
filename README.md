@@ -12,6 +12,18 @@ múltipla**. Os cards são criados automaticamente a partir dos valores
 preenchidos nesse campo; músicas sem playlist continuam aparecendo na listagem
 geral.
 
+## Configuração de gravações
+
+O Airtable é acessado apenas pelas rotas do servidor. Configure no ambiente de
+produção `AIRTABLE_BASE`, `AIRTABLE_TOKEN`, `AIRTABLE_ALBUMS_TABLE_ID`,
+`RECORDING_PASSWORD` e `RECORDING_AUTH_SECRET`. O token precisa dos escopos
+`data.records:read`, `data.records:write`, `schema.bases:read` e
+`schema.bases:write` no base. Não use `NEXT_PUBLIC_AIRTABLE_TOKEN` em novos
+deploys; rotacione o token que já foi exposto ao navegador.
+
+O envio e a gravação aceitam arquivos de até 4 MB, para permanecer dentro do
+limite da Vercel e do endpoint de anexos do Airtable.
+
 First, run the development server:
 
 ```bash

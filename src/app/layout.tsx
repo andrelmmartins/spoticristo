@@ -6,6 +6,8 @@ import { SongProvider } from "@/contexts/SongContext";
 import { QueryProvider } from "@/providers/QueryProvider";
 import Sidebar from "@/components/Sidebar";
 
+export const dynamic = "force-dynamic";
+
 const font = Urbanist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

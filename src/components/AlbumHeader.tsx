@@ -1,14 +1,15 @@
 'use client'
 
 import { Album } from '@/@types/interfaces'
-import { Play } from 'lucide-react'
+import { Plus, Play } from 'lucide-react'
 
 interface AlbumHeaderProps {
   album: Album
   onPlayAll: () => void
+  onAddSong: () => void
 }
 
-const AlbumHeader = ({ album, onPlayAll }: AlbumHeaderProps) => {
+const AlbumHeader = ({ album, onPlayAll, onAddSong }: AlbumHeaderProps) => {
   return (
     <div className="relative">
       <div 
@@ -48,9 +49,14 @@ const AlbumHeader = ({ album, onPlayAll }: AlbumHeaderProps) => {
 
           <div className="flex-1 min-w-0 text-center sm:text-left">
             <div className="mb-4">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 break-words">
-                {album.name}
-              </h1>
+              <div className="flex items-start justify-center gap-2 sm:justify-start">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 break-words">
+                  {album.name}
+                </h1>
+                <button type="button" onClick={onAddSong} aria-label="Adicionar música" title="Adicionar música" className="mt-1 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/20 bg-black/20 text-white transition-colors hover:border-spotify-green hover:bg-spotify-green hover:text-black">
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
             {album.tags.length > 0 && (

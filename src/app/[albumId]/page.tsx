@@ -11,6 +11,7 @@ import AlbumPageSkeleton from "@/components/AlbumPageSkeleton";
 import MusicPlayer from "@/components/MusicPlayer";
 import PlaylistSection from "@/components/PlaylistSection";
 import { Song } from "@/@types/interfaces";
+import RecordingModal, { getOwnedRecordingIds } from "@/components/RecordingModal";
 import { ArrowLeft, Music, Search, X } from "lucide-react";
 import Link from "next/link";
 
@@ -30,11 +31,14 @@ export default function AlbumPage() {
     currentSong, 
     isPlaying, 
     getSongs, 
+    refreshSongs,
     setCurrentSong, 
     setIsPlaying, 
   } = useSong();
   const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [modalSong, setModalSong] = useState<Song | null | undefined>(undefined);
+  const [ownedSongIds, setOwnedSongIds] = useState<Set<string>>(new Set());
   const deferredSearchQuery = useDeferredValue(searchQuery);
 
   const currentAlbum = albums.find((album) => album.id === albumId);
@@ -90,6 +94,18 @@ export default function AlbumPage() {
     setSelectedPlaylist(null);
     setSearchQuery("");
   }, [albumId]);
+
+  useEffect(() => {
+    setOwnedSongIds(new Set(getOwnedRecordingIds()));
+  }, [songs]);
+
+  useEffect(() => {
+    if (!currentSong) return;
+    const refreshedSong = songs.find((song) => song.id === currentSong.id);
+    if (refreshedSong && refreshedSong.src !== currentSong.src) {
+      setCurrentSong(refreshedSong);
+    }
+  }, [currentSong, setCurrentSong, songs]);
 
   useEffect(() => {
     if (selectedPlaylist && !playlists.includes(selectedPlaylist)) {
@@ -184,6 +200,7 @@ export default function AlbumPage() {
       <AlbumHeader 
         album={currentAlbum} 
         onPlayAll={handlePlayAll}
+        onAddSong={() => setModalSong(null)}
       />
 
       <div className="px-4 lg:px-8 py-8">
@@ -256,6 +273,8 @@ export default function AlbumPage() {
                   isPlaying={isPlaying}
                   onSongSelect={handleSongSelect}
                   onPlayPause={handlePlayPause}
+                  editableSongIds={ownedSongIds}
+                  onEditSong={(song) => setModalSong(song)}
                 />
               ) : (
                 <div className="rounded-lg border border-dark-700 bg-dark-800/40 py-12 text-center">
@@ -297,6 +316,19 @@ export default function AlbumPage() {
         onSongSelect={handleSongSelect}
         onClose={handleClosePlayer}
       />
+      {modalSong !== undefined && (
+        <RecordingModal
+          albumId={currentAlbum.id}
+          song={modalSong || undefined}
+          availableTags={Array.from(new Set(songs.flatMap((song) => song.tags)))}
+          availablePlaylists={Array.from(new Set(songs.flatMap((song) => song.playlists)))}
+          onClose={() => setModalSong(undefined)}
+          onSaved={async () => {
+            await refreshSongs(currentAlbum.id);
+            setOwnedSongIds(new Set(getOwnedRecordingIds()));
+          }}
+        />
+      )}
     </div>
   );
 }

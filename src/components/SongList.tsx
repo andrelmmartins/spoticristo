@@ -1,7 +1,7 @@
 'use client'
 
 import { Song } from '@/@types/interfaces'
-import { Play, Pause } from 'lucide-react'
+import { MoreVertical, Play, Pause } from 'lucide-react'
 
 interface SongListProps {
   songs: Song[]
@@ -9,9 +9,11 @@ interface SongListProps {
   isPlaying: boolean
   onSongSelect: (song: Song) => void
   onPlayPause: () => void
+  editableSongIds?: Set<string>
+  onEditSong?: (song: Song) => void
 }
 
-const SongList = ({ songs, currentSong, isPlaying, onSongSelect, onPlayPause }: SongListProps) => {
+const SongList = ({ songs, currentSong, isPlaying, onSongSelect, onPlayPause, editableSongIds, onEditSong }: SongListProps) => {
   const handleSongClick = (song: Song) => {
     if (currentSong?.id === song.id) {
       onPlayPause()
@@ -39,6 +41,7 @@ const SongList = ({ songs, currentSong, isPlaying, onSongSelect, onPlayPause }: 
         {songs.map((song, index) => {
           const isCurrentSong = currentSong?.id === song.id
           const isPlayingCurrent = isCurrentSong && isPlaying
+          const isEditable = editableSongIds?.has(song.id)
 
           return (
             <div
@@ -46,7 +49,7 @@ const SongList = ({ songs, currentSong, isPlaying, onSongSelect, onPlayPause }: 
               onClick={() => handleSongClick(song)}
               className={`
                 group px-4 sm:px-8 py-3 sm:py-4 hover:bg-dark-700/50 transition-colors cursor-pointer
-                ${isCurrentSong ? 'bg-dark-700/30' : ''}
+                ${isCurrentSong ? 'bg-dark-700/30' : ''} ${isEditable ? 'border-l-2 border-l-spotify-green bg-spotify-green/5' : ''}
               `}
             >
               {/* Desktop Layout */}
@@ -72,12 +75,13 @@ const SongList = ({ songs, currentSong, isPlaying, onSongSelect, onPlayPause }: 
 
                 <div className="col-span-5">
                   <div className="flex items-center space-x-4">
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1 flex items-center gap-2">
                       <h3 className={`font-medium break-words ${
                         isCurrentSong ? 'text-spotify-green' : 'text-white'
                       }`}>
                         {song.name}
                       </h3>
+                      {isEditable && <span className="rounded-full border border-spotify-green/30 bg-spotify-green/10 px-2 py-0.5 text-[10px] font-semibold text-spotify-green">Sua gravação</span>}
                     </div>
                   </div>
                 </div>
@@ -86,7 +90,7 @@ const SongList = ({ songs, currentSong, isPlaying, onSongSelect, onPlayPause }: 
                   <span className="text-dark-300 text-sm">{song.tone}</span>
                 </div>
 
-                <div className="col-span-2 min-w-0">
+                <div className="col-span-2 min-w-0 flex items-center gap-1">
                   <div className="flex flex-wrap gap-1">
                     {song.tags.slice(0, 2).map((tag, tagIndex) => (
                       <span
@@ -102,6 +106,7 @@ const SongList = ({ songs, currentSong, isPlaying, onSongSelect, onPlayPause }: 
                       </span>
                     )}
                   </div>
+                  {isEditable && onEditSong && <button type="button" onClick={(event) => { event.stopPropagation(); onEditSong(song); }} className="ml-auto rounded-full p-2 text-dark-300 hover:bg-dark-600 hover:text-white" aria-label={`Editar ${song.name}`}><MoreVertical className="h-4 w-4" /></button>}
                 </div>
               </div>
 
@@ -126,11 +131,11 @@ const SongList = ({ songs, currentSong, isPlaying, onSongSelect, onPlayPause }: 
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <h3 className={`font-medium text-sm break-words leading-tight ${
+                    <div className="flex items-start gap-1"><h3 className={`font-medium text-sm break-words leading-tight ${
                       isCurrentSong ? 'text-spotify-green' : 'text-white'
                     }`}>
                       {song.name}
-                    </h3>
+                    </h3>{isEditable && <span className="rounded-full border border-spotify-green/30 px-1.5 py-0.5 text-[9px] text-spotify-green">Sua</span>}{isEditable && onEditSong && <button type="button" onClick={(event) => { event.stopPropagation(); onEditSong(song); }} className="-mt-1 ml-auto shrink-0 rounded-full p-1 text-dark-300 hover:text-white" aria-label={`Editar ${song.name}`}><MoreVertical className="h-4 w-4" /></button>}</div>
                     <div className="flex flex-wrap items-center gap-1 mt-1 min-w-0">
                       <span className="text-dark-300 text-xs shrink-0">{song.tone}</span>
                       {song.tags.length > 0 && (

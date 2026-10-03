@@ -33,7 +33,7 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <div className={`
-        w-64 min-h-dvh bg-dark-900 border-r border-dark-700 flex flex-col
+        w-64 h-dvh bg-dark-900 border-r border-dark-700 flex flex-col
         fixed lg:relative z-50 transform transition-transform duration-300 ease-in-out
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
@@ -46,7 +46,7 @@ const Sidebar = () => {
         </Link>
       </div>
 
-      <nav className="flex-1 px-4">
+      <nav className="flex min-h-0 flex-1 flex-col px-4">
         <ul className="space-y-1">
           {menuItems.map((item) => {
             const isActive = pathname === item.href
@@ -73,7 +73,7 @@ const Sidebar = () => {
           })}
         </ul>
 
-        <div className="mt-8">
+        <div className="mt-8 flex min-h-0 flex-1 flex-col">
           <div className="px-4 mb-4">
             <h3 className="text-xs font-semibold text-dark-400 uppercase tracking-wider">
               Álbuns
@@ -95,7 +95,7 @@ const Sidebar = () => {
               ))}
             </div>
           ) : (
-            <ul className="space-y-1 max-h-64 overflow-y-auto">
+            <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto pb-4">
               {albums.map((album) => (
                 <li key={album.id}>
                   <Link
